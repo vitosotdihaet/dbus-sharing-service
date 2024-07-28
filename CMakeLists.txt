@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Qt6 REQUIRED COMPONENTS DBus)
 
+add_compile_options(-Wall -Wextra -Wpedantic)
+
 qt6_wrap_cpp(MOC_SOURCES sharingService.hpp)
 
 add_executable(SharingService main.cpp sharingService.cpp ${MOC_SOURCES})

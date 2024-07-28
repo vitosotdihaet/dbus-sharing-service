@@ -3,6 +3,7 @@
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusMessage>
+#include <QDBusInterface>
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
@@ -85,7 +86,23 @@ void SharingRegisterService::OpenFileUsingService(const QString &path, const QSt
         return;
     }
 
-    QProcess::startDetached(service, QStringList() << path);
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    if (!connection.isConnected()) {
+        qFatal("Cannot connect to the D-Bus session bus.");
+        return;
+    }
+
+    QDBusInterface interface(service, "/", service, connection);
+    if (!interface.isValid()) {
+        qFatal("D-Bus interface is not valid.");
+        return;
+    }
+
+    QDBusMessage reply = interface.call("OpenFile", path);
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qDebug() << "Failed to open the file:" << path << "with service:" << service << "--" << reply.errorMessage();
+        return;
+    }
 }
 
 void SharingRegisterService::loadServices() {
@@ -110,8 +127,9 @@ void SharingRegisterService::saveServices() {
 }
 
 bool SharingRegisterService::isServiceRunning(const QString &service) {
-    QProcess process;
-    process.start("pgrep", QStringList() << service);
-    process.waitForFinished();
-    return process.exitCode() == 0;
+    QDBusConnection dbusConnection = QDBusConnection::sessionBus();
+    if (dbusConnection.interface()->isServiceRegistered(service)) {
+        return true;
+    }
+    return false;
 }

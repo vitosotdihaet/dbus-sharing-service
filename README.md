@@ -10,10 +10,20 @@ cmake ..
 make
 ```
 
+You can also use some `cmake` flags to customize your building process:
+- `BUILD_SRS` - builds the sharing register service *(ON by default)*
+- `BUILD_SS` - builds the sharing service dynamic library *(ON by default)*
+- `BUILD_EXAMPLES` - builds examples on how to use the sharing service dynamic library *(OFF by default, works only if BUILD_SS is ON)*
+
 # How to run
 ```bash
 ./srs # stands for Sharing Register Service
 ```
+
+On running, a DBus process is created, named `com.system.sharing`, with three methods:
+- `RegisterService`, that accepts a name *(string)* of a DBus service to be registered and its supported file formats *(array of strings)*
+- `OpenFileUsingService`, that accepts an absoulte path to the file *(string)* and a service name *(string)*. The method `OpenFile` of the provided service is run on the file path
+- `OpenFile`, that accepts an absolute path to the file *(string)*. The method `OpenFile` of one of the provided services, that supports the file's format is run on the file path
 
 # How to use
 ## From a terminal
@@ -89,4 +99,13 @@ target_link_libraries(main PRIVATE Qt6::DBus ss)
 ### Accessing directly after running
 ```bash
 gdbus call -e -d your.service.name -o / -m your.service.name.OpenFile "/your/absolute/file.path"
+```
+
+### Examples
+There are examples in the examples folder, to build them, go to the `build` folder and run:
+```bash
+cmake -DBUILD_EXAMPLES=ON ..
+make
+# now you can run any example in the examples folder, for example:
+./examples/example1/SharingServiceExample # note that you need to run build/srs to connect to it
 ```

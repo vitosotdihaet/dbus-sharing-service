@@ -1,18 +1,16 @@
 #include "sharingService.hpp"
 
-#include <QObject>
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusMessage>
 #include <QFile>
 #include <QFileInfo>
-#include <QString>
 #include <QProcess>
+#include <QSettings>
+#include <QCoreApplication>
 
 #include <cstdlib>
 #include <ctime>
-#include <filesystem>
-
 
 
 SharingService::SharingService(QObject *parent) :
@@ -40,14 +38,17 @@ SharingService::SharingService(QObject *parent) :
     }
 
     std::srand(std::time(nullptr)); // set the random seed for random service selection
+
+    loadServices();
+}
+
+SharingService::~SharingService() {
+    saveServices();
 }
 
 void SharingService::RegisterService(const QString &name, const QStringList &supportedFormats) {
-    if (services.contains(name)) {
-        services[name] = supportedFormats;
-    } else {
-        services.insert(name, supportedFormats);
-    }
+    services[name] = supportedFormats;
+    saveServices();
 }
 
 void SharingService::OpenFile(const QString &path) {
@@ -62,7 +63,7 @@ void SharingService::OpenFile(const QString &path) {
 
     QStringList availableServices;
     for (auto it = services.cbegin(); it != services.cend(); ++it) {
-        if (it.value().contains(fileExtension)) {
+        if (it.value().contains(fileExtension) && isServiceRunning(it.key())) {
             availableServices.append(it.key());
         }
     }
@@ -78,11 +79,39 @@ void SharingService::OpenFile(const QString &path) {
 }
 
 void SharingService::OpenFileUsingService(const QString &path, const QString &service) {
-    if (!services.contains(service)) {
+    if (!services.contains(service) || !isServiceRunning(service)) {
         QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs, "Service is not registered");
         QDBusConnection::sessionBus().send(error);
         return;
     }
 
     QProcess::startDetached(service, QStringList() << path);
+}
+
+void SharingService::loadServices() {
+    QSettings settings(configFilePath, QSettings::IniFormat);
+
+    settings.beginGroup("Services");
+    QStringList keys = settings.childKeys();
+    for (const QString &key : keys) {
+        services[key] = settings.value(key).toStringList();
+    }
+    settings.endGroup();
+}
+
+void SharingService::saveServices() {
+    QSettings settings(configFilePath, QSettings::IniFormat);
+
+    settings.beginGroup("Services");
+    for (const QString &key : services.keys()) {
+        settings.setValue(key, services[key]);
+    }
+    settings.endGroup();
+}
+
+bool SharingService::isServiceRunning(const QString &service) {
+    QProcess process;
+    process.start("pgrep", QStringList() << service);
+    process.waitForFinished();
+    return process.exitCode() == 0;
 }

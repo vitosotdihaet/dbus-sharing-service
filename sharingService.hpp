@@ -5,7 +5,6 @@
 #include <QStringList>
 #include <QMap>
 
-
 #define DBUS_SERVICE_NAME "com.system.sharing"
 
 class SharingService : public QObject
@@ -14,7 +13,8 @@ class SharingService : public QObject
     Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
 
 public:
-    explicit SharingService(QObject *parent);
+    explicit SharingService(QObject *parent = nullptr);
+    ~SharingService();
 
 public slots:
     void RegisterService(const QString &name, const QStringList &supportedFormats);
@@ -23,4 +23,9 @@ public slots:
 
 private:
     QMap<QString, QStringList> services;
+    QString configFilePath = "services.ini";
+
+    void loadServices();
+    void saveServices();
+    bool isServiceRunning(const QString &service);
 };

@@ -8,8 +8,28 @@ find_package(Qt6 REQUIRED COMPONENTS DBus)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-qt6_wrap_cpp(MOC_SOURCES sharingService.hpp)
 
-add_executable(SharingService main.cpp sharingService.cpp ${MOC_SOURCES})
 
-target_link_libraries(SharingService PRIVATE Qt6::DBus)
+set(SHARING_REGISTER_SERVICE ${CMAKE_SOURCE_DIR}/sharingRegisterService)
+
+set(SHARING_REGISTER_SERVICE_INCLUDE ${SHARING_REGISTER_SERVICE}/include)
+set(SHARING_REGISTER_SERVICE_SOURCES ${SHARING_REGISTER_SERVICE}/src)
+
+set(SHARING_REGISTER_SERVICE_HEADERS
+    ${SHARING_REGISTER_SERVICE_INCLUDE}/sharingRegisterService.hpp
+)
+
+set(SHARING_REGISTER_SERVICE_SOURCES
+    ${SHARING_REGISTER_SERVICE_SOURCES}/main.cpp
+    ${SHARING_REGISTER_SERVICE_SOURCES}/sharingRegisterService.cpp
+)
+
+qt6_wrap_cpp(SHARING_REGISTER_SERVICE_MOC_SOURCES ${SHARING_REGISTER_SERVICE_HEADERS})
+
+add_executable(srs
+    ${SHARING_REGISTER_SERVICE_SOURCES}
+    ${SHARING_REGISTER_SERVICE_MOC_SOURCES}
+)
+
+target_include_directories(srs PRIVATE ${SHARING_REGISTER_SERVICE_INCLUDE})
+target_link_libraries(srs PRIVATE Qt6::DBus)

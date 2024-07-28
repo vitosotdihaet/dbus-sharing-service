@@ -1,4 +1,4 @@
-#include "sharingService.hpp"
+#include "sharingRegisterService.hpp"
 
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
@@ -13,7 +13,7 @@
 #include <ctime>
 
 
-SharingService::SharingService(QObject *parent) :
+SharingRegisterService::SharingRegisterService(QObject *parent) :
     QObject(parent) {
     QDBusConnection dbusConnection = QDBusConnection::sessionBus();
 
@@ -42,16 +42,16 @@ SharingService::SharingService(QObject *parent) :
     loadServices();
 }
 
-SharingService::~SharingService() {
+SharingRegisterService::~SharingRegisterService() {
     saveServices();
 }
 
-void SharingService::RegisterService(const QString &name, const QStringList &supportedFormats) {
+void SharingRegisterService::RegisterService(const QString &name, const QStringList &supportedFormats) {
     services[name] = supportedFormats;
     saveServices();
 }
 
-void SharingService::OpenFile(const QString &path) {
+void SharingRegisterService::OpenFile(const QString &path) {
     QFile file(path);
     if (!file.exists()) {
         QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs, "File does not exist");
@@ -78,7 +78,7 @@ void SharingService::OpenFile(const QString &path) {
     OpenFileUsingService(path, selectedService);
 }
 
-void SharingService::OpenFileUsingService(const QString &path, const QString &service) {
+void SharingRegisterService::OpenFileUsingService(const QString &path, const QString &service) {
     if (!services.contains(service) || !isServiceRunning(service)) {
         QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs, "Service is not registered");
         QDBusConnection::sessionBus().send(error);
@@ -88,7 +88,7 @@ void SharingService::OpenFileUsingService(const QString &path, const QString &se
     QProcess::startDetached(service, QStringList() << path);
 }
 
-void SharingService::loadServices() {
+void SharingRegisterService::loadServices() {
     QSettings settings(configFilePath, QSettings::IniFormat);
 
     settings.beginGroup("Services");
@@ -99,7 +99,7 @@ void SharingService::loadServices() {
     settings.endGroup();
 }
 
-void SharingService::saveServices() {
+void SharingRegisterService::saveServices() {
     QSettings settings(configFilePath, QSettings::IniFormat);
 
     settings.beginGroup("Services");
@@ -109,7 +109,7 @@ void SharingService::saveServices() {
     settings.endGroup();
 }
 
-bool SharingService::isServiceRunning(const QString &service) {
+bool SharingRegisterService::isServiceRunning(const QString &service) {
     QProcess process;
     process.start("pgrep", QStringList() << service);
     process.waitForFinished();

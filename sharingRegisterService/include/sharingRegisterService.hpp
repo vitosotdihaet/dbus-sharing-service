@@ -7,14 +7,14 @@
 
 #define DBUS_SERVICE_NAME "com.system.sharing"
 
-class SharingService : public QObject
+class SharingRegisterService : public QObject
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
 
 public:
-    explicit SharingService(QObject *parent = nullptr);
-    ~SharingService();
+    explicit SharingRegisterService(QObject *parent = nullptr);
+    ~SharingRegisterService();
 
 public slots:
     void RegisterService(const QString &name, const QStringList &supportedFormats);

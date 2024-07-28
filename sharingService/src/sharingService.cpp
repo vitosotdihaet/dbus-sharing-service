@@ -39,15 +39,14 @@ bool SharingService::registerObject() {
 
 bool SharingService::addToSharingRegisterService() {
     QDBusConnection connection = QDBusConnection::sessionBus();
-
     if (!connection.isConnected()) {
-        qFatal("Cannot connect to the D-Bus session bus.");
+        qFatal("Can't connect to the D-Bus session bus.");
         return false;
     }
 
-    QDBusInterface interface("com.system.sharing", "/", "com.system.sharing", connection);
+    QDBusInterface interface("com.system.sharing", "/", "com.system.sharing", connection); // autoexec if not running
     if (!interface.isValid()) {
-        qFatal("D-Bus interface is not valid.");
+        qFatal("The sharing system is not running.");
         return false;
     }
 

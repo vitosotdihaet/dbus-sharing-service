@@ -1,25 +1,24 @@
 #include "sharingService.hpp"
 
-#include <QtGlobal>
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
-
+#include <QtGlobal>
 
 void onOpenFile(const QString &path) {
-    qInfo() << "File" << path << "is opened";
+  qInfo() << "File" << path << "is opened";
 }
 
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
+  QCoreApplication app(argc, argv);
 
-    QStringList supportedFormats = {"mp3"};
-    SharingService service("my.audio.service", supportedFormats, onOpenFile);
+  QStringList supportedFormats = {"mp3"};
+  SharingService service("my.audio.service", supportedFormats, onOpenFile);
 
-    if (!service.start()) {
-        qInfo() << "Failed to start SharingService";
-        return 1;
-    }
+  if (!service.start()) {
+    qInfo() << "Failed to start SharingService";
+    return 1;
+  }
 
-    return app.exec();
+  return app.exec();
 }

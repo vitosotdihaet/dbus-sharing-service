@@ -3,11 +3,10 @@
 #include <QCoreApplication>
 #include <QDBusConnection>
 
-
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
+  QCoreApplication app(argc, argv);
 
-    SharingRegisterService sharingService;
+  SharingRegisterService sharingService;
 
-    return app.exec();
+  return app.exec();
 }

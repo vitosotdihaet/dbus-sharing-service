@@ -13,7 +13,7 @@ make
 You can also use some `cmake` flags to customize your building process:
 - `BUILD_SRS` - builds the sharing register service *(ON by default)*
 - `BUILD_SS` - builds the sharing service dynamic library *(ON by default)*
-- `BUILD_EXAMPLES` - builds examples on how to use the sharing service dynamic library *(OFF by default, works only if BUILD_SS is ON)*
+- `BUILD_EXAMPLES` - builds examples on how to use the sharing service dynamic library *(OFF by default, works only if `BUILD_SS` is ON)*
 
 # How to run
 ```bash

@@ -42,12 +42,51 @@ gdbus call --session --dest com.system.sharing --object-path / --method com.syst
 ```
 
 ## As a C++ dynamic library
-### How to use [TODO]
+### How to use (cmake)
+After building SharingService, you need to add the library and the header file to your project
+- Copy the shared library `libss.so` and put it into your `library`
+- Copy the header `sharingService/include/sharingService.hpp` to your `include` folder
+
+Set up your `main.cpp`:
+```
+#include "sharingService.hpp"
+
+#include <QtGlobal>
+#include <QCoreApplication>
+#include <QString>
+#include <QStringList>
 
 
-### Accessing after running
-Directly
+void onOpenFile(const QString &path) {
+    qInfo() << "File" << path << "is opened";
+}
+
+int main(int argc, char *argv[]) {
+    QCoreApplication app(argc, argv);
+
+    QStringList supportedFormats = {"mp3"};
+    SharingService service("my.audio.service", supportedFormats, onOpenFile);
+
+    if (!service.start()) {
+        qInfo() << "Failed to start SharingService";
+        return 1;
+    }
+
+    return app.exec();
+}
+```
+
+The `onOpenFile` function, that is passed to the constructor must be of type `void` and accept a single parameter `const QString &`
+
+Next, update your cmake building script: add linking to `libss.so` *(create moc sources, link directories, link the library to your target)*:
+```cmake
+qt6_wrap_cpp(MOC_SOURCES ${CMAKE_SOURCE_DIR}/include/sharingService.hpp)
+link_directories(${CMAKE_SOURCE_DIR}/lib)
+add_executable(main src/main.cpp ${MOC_SOURCES})
+target_link_libraries(main PRIVATE Qt6::DBus ss)
+```
+
+### Accessing directly after running
 ```bash
 gdbus call -e -d your.service.name -o / -m your.service.name.OpenFile "/your/absolute/file.path"
 ```
-

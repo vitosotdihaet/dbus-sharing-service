@@ -63,6 +63,7 @@ bool SharingService::addToSharingRegisterService() {
 void SharingService::OpenFile(const QString &path) {
     QFile file(path);
     if (!file.exists()) {
+        qInfo() << "File" << path << "doesn't exist";
         QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs, "File does not exist");
         QDBusConnection::sessionBus().send(error);
         return;

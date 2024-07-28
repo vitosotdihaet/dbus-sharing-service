@@ -9,7 +9,6 @@ find_package(Qt6 REQUIRED COMPONENTS DBus)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 
-
 # Sharing Register Service
 set(SHARING_REGISTER_SERVICE ${CMAKE_SOURCE_DIR}/sharingRegisterService)
 

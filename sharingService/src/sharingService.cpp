@@ -8,7 +8,8 @@
 #include <QtDBus>
 #include <QFile>
 #include <QFileInfo>
-#include <QDebug>
+#include <QtGlobal>
+
 
 SharingService::SharingService(const QString &serviceName, const QStringList &supportedFormats, std::function<void(const QString &)> onOpenFile, QObject *parent)
     : QDBusVirtualObject(parent), serviceName(serviceName), supportedFormats(supportedFormats), onOpenFile(onOpenFile) {}
@@ -20,7 +21,7 @@ bool SharingService::start() {
 bool SharingService::registerService() {
     QDBusConnection dbus = QDBusConnection::sessionBus();
     if (!dbus.registerService(serviceName)) {
-        qFatal("Can't register D-Bus service.");
+        qInfo("Can't register D-Bus service.");
         return false;
     }
 
@@ -30,7 +31,7 @@ bool SharingService::registerService() {
 bool SharingService::registerObject() {
     QDBusConnection dbus = QDBusConnection::sessionBus();
     if (!dbus.registerVirtualObject("/", this)) {
-        qFatal("Can't register D-Bus object.");
+        qInfo("Can't register D-Bus object.");
         return false;
     }
 
@@ -40,19 +41,19 @@ bool SharingService::registerObject() {
 bool SharingService::addToSharingRegisterService() {
     QDBusConnection connection = QDBusConnection::sessionBus();
     if (!connection.isConnected()) {
-        qFatal("Can't connect to the D-Bus session bus.");
+        qInfo("Can't connect to the D-Bus session bus.");
         return false;
     }
 
     QDBusInterface interface("com.system.sharing", "/", "com.system.sharing", connection); // autoexec if not running
     if (!interface.isValid()) {
-        qFatal("The sharing system is not running.");
+        qInfo("The sharing system is not running.");
         return false;
     }
 
     QDBusMessage reply = interface.call("RegisterService", serviceName, supportedFormats);
     if (reply.type() == QDBusMessage::ErrorMessage) {
-        qDebug() << "Failed to register service:" << reply.errorMessage();
+        qInfo() << "Failed to register service:" << reply.errorMessage();
         return false;
     }
 

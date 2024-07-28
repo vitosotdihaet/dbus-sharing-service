@@ -1,9 +1,12 @@
 #include "sharingService.hpp"
 
+#include <QObject>
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
 #include <QDBusMessage>
 #include <QFile>
 #include <QFileInfo>
+#include <QString>
 #include <QProcess>
 
 #include <cstdlib>
@@ -11,6 +14,33 @@
 #include <filesystem>
 
 
+
+SharingService::SharingService(QObject *parent) :
+    QObject(parent) {
+    QDBusConnection dbusConnection = QDBusConnection::sessionBus();
+
+    if (!dbusConnection.isConnected()) {
+        qFatal("Can't connect to the D-Bus session bus.");
+        return;
+    }
+
+    if (dbusConnection.interface()->isServiceRegistered(QString(DBUS_SERVICE_NAME))) {
+        qFatal("Service is already registered.");
+        return;
+    }
+
+    if (!dbusConnection.registerService(QString(DBUS_SERVICE_NAME))) {
+        qFatal("Can't register D-Bus service.");
+        return;
+    }
+
+    if (!dbusConnection.registerObject("/", this, QDBusConnection::ExportAllSlots)) {
+        qFatal("Can't register D-Bus object.");
+        return;
+    }
+
+    std::srand(std::time(nullptr)); // set the random seed for random service selection
+}
 
 void SharingService::RegisterService(const QString &name, const QStringList &supportedFormats) {
     if (services.contains(name)) {

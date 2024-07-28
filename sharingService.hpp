@@ -6,10 +6,15 @@
 #include <QMap>
 
 
+#define DBUS_SERVICE_NAME "com.system.sharing"
+
 class SharingService : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "com.system.sharing")
+    Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
+
+public:
+    explicit SharingService(QObject *parent);
 
 public slots:
     void RegisterService(const QString &name, const QStringList &supportedFormats);

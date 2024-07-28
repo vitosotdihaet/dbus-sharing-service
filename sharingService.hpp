@@ -4,7 +4,7 @@
 #include <QString>
 #include <QStringList>
 #include <QMap>
-#include <QDBusError>
+
 
 class SharingService : public QObject
 {

@@ -1,14 +1,18 @@
 # Prerequisites
 Make sure Qt6 is installed on your machine, if not, please follow [this tutorial](https://doc.qt.io/qt-6/get-and-install-qt.html)
 
-# How to run
+# How to build
 ```bash
 git clone https://github.com/vitosotdihaet/dbus-sharing-service.git
 cd dbus-sharing-service
 mkdir build && cd build
 cmake ..
 make
-./SharingService
+```
+
+# How to run
+```bash
+./srs # stands for Sharing Register Service
 ```
 
 # How to use

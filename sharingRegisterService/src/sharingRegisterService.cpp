@@ -7,7 +7,6 @@
 #include <QDBusMessage>
 #include <QFile>
 #include <QFileInfo>
-#include <QProcess>
 #include <QSettings>
 
 #include <cstdlib>

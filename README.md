@@ -69,8 +69,8 @@ Class `SharingService` is the only thing added with this library. On constructio
 
 The constructor of the `SharingService` accepts three arguments: a DBus object path, the supported formats of the service and a function, accepting `QString` and returning `void` to be run when method `OpenFile` is invoked
 
-## How to use (`cmake`)
-After building with `BUILD_LIBSS`, you need to link the library and include the header file to your target program
+## How to use
+After building with `BUILD_LIBSS=ON`, you need to link the library and include the header file to your target program
 
 Set up your `main.cpp`:
 ```cpp

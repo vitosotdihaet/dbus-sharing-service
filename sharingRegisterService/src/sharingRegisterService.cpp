@@ -61,7 +61,7 @@ void SharingRegisterService::OpenFile(const QString &path) {
     return;
   }
 
-  QString fileExtension = QFileInfo(path).suffix().toLower();
+  QString fileExtension = QFileInfo(file).suffix().toLower();
 
   QStringList availableServices;
   for (auto it = services.cbegin(); it != services.cend(); ++it) {

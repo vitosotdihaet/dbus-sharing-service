@@ -11,28 +11,37 @@ make
 ```
 
 You can also use some `cmake` flags to customize your building process:
-- `BUILD_SRS` - builds the sharing register service *(ON by default)*
-- `BUILD_SS` - builds the sharing service dynamic library *(ON by default)*
-- `BUILD_EXAMPLES` - builds examples on how to use the sharing service dynamic library *(OFF by default, works only if `BUILD_SS` is ON)*
+- `BUILD_SRS` - builds the Sharing Register Service *(ON by default)*
+- `BUILD_SS` - builds the Sharing Service dynamic library *(ON by default)*
+- `BUILD_EXAMPLES` - builds examples *(OFF by default)*
 
-# How to run
+
+# Sharing Register Service
+Sharing Register Service is a DBus service, with path of `com.system.sharing`, which purpose is to store other DBus service paths for sharing files.
+
+Instead of remembering all the DBus services file paths for each file type, you can register a service path with supported formats in the Sharing Register Service
+
+Now, on opening the file with `com.system.sharing`, one of the registered services that support this file format would open it
+
+Sharing Register Service has three methods:
+- `RegisterService`, that accepts a DBus object path *(string)* to be registered and its supported file formats *(array of strings)*
+- `OpenFileUsingService`, that accepts an absoulte path to the file *(string)* and a DBus object path *(string)*. The method `OpenFile` of the provided object is run with the file path as its first argument
+- `OpenFile`, that accepts an absolute path to the file *(string)*. The method `OpenFile` of one of the provided objects, that supports the file's format is run with the file path as its first argument
+
+## How to run
 ```bash
-./srs # stands for Sharing Register Service
+./sharingRegisterService/srs
 ```
 
-On running, a DBus process is created, named `com.system.sharing`, with three methods:
-- `RegisterService`, that accepts a name *(string)* of a DBus service to be registered and its supported file formats *(array of strings)*
-- `OpenFileUsingService`, that accepts an absoulte path to the file *(string)* and a service name *(string)*. The method `OpenFile` of the provided service is run on the file path
-- `OpenFile`, that accepts an absolute path to the file *(string)*. The method `OpenFile` of one of the provided services, that supports the file's format is run on the file path
+To exit, simply press `Ctrl+C`
 
-# How to use
-## From a terminal
+## How to use
 Registering a service:
 ```bash
 gdbus call -e -d com.system.sharing -o / -m com.system.sharing.RegisterService "your.dbus.service" "[\"supported\", \"extensions\"]"
 ```
 
-Opening a file *(with one of the random registered services, that support files with this extension)*:
+Opening a file:
 ```bash
 gdbus call -e -d com.system.sharing -o / -m com.system.sharing.OpenFile "/your/absolute/file.path"
 ```
@@ -51,11 +60,17 @@ gdbus call -e -d com.system.sharing -o / -m com.system.sharing.OpenFileUsingServ
 gdbus call -e -d com.system.sharing -o / -m com.system.sharing.OpenFile "/home/user/Documents/video.mp4"
 ```
 
-## As a C++ dynamic library
-### How to use (cmake)
-After building SharingService, you need to add the library and the header file to your project
-- Copy the shared library `libss.so` and put it into your `library`
-- Copy the header `sharingService/include/sharingService.hpp` to your `include` folder
+For working with files in a working directory, instead of writing the whole absolute path just start your filepath with `` `pwd` ``, e. g. instead of `"/home/user/Documents/important/file.mp3"` (assuming you are in the `Documents folder`), use ``"`pwd`/important/file.mp3"``
+
+# Sharing Service
+Sharing Service is a dynamic C++ library that can be used for an easy development of services
+
+Class `SharingService` is the only thing added with this library. On construction, a new DBus object is created with a single method - `OpenFile`
+
+The constructor of the `SharingService` accepts three arguments: a DBus object path, the supported formats of the service and a function, accepting `QString` and returning `void` to be run when method `OpenFile` is invoked
+
+## How to use (`cmake`)
+After building, you need to link the library and include the header file to your target program
 
 Set up your `main.cpp`:
 ```
@@ -88,24 +103,35 @@ int main(int argc, char *argv[]) {
 
 The `onOpenFile` function, that is passed to the constructor must be of type `void` and accept a single parameter `const QString &`
 
-Next, update your cmake building script: add linking to `libss.so` *(create moc sources, link directories, link the library to your target)*:
+Next, update your cmake building script - add linking to `libss.so` and include the header:
+- Copy the shared library `libss.so` and put it into your `lib` folder
+- Copy the header `sharingService/include/sharingService.hpp` to your `include` folder
 ```cmake
-qt6_wrap_cpp(MOC_SOURCES ${CMAKE_SOURCE_DIR}/include/sharingService.hpp)
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+find_package(Qt6 REQUIRED COMPONENTS Core DBus)
+qt6_wrap_cpp(MOC_SOURCES include/sharingService.hpp)
+link_directories(lib)
 add_executable(main src/main.cpp ${MOC_SOURCES})
-target_link_libraries(main PRIVATE Qt6::DBus ss)
+target_link_libraries(main PRIVATE Qt6::Core Qt6::DBus ss)
 ```
 
-### Accessing directly after running
+To exit, press `Ctrl+C`
+
+## Accessing the service directly
 ```bash
-gdbus call -e -d your.service.name -o / -m your.service.name.OpenFile "/your/absolute/file.path"
+gdbus call -e -d my.audio.service -o / -m my.audio.service.OpenFile "`pwd`/Documents/sound.mp3"
 ```
 
-### Examples
+# Examples
 There are examples in the examples folder, to build them, go to the `build` folder and run:
+
 ```bash
 cmake -DBUILD_EXAMPLES=ON ..
 make
-# now you can run any example in the examples folder, for example:
-./examples/example1/SharingServiceExample # note that you need to run build/srs to connect to it
+```
+
+## SharingServiceExample
+Shows a basic setup for using the Sharing Service ***(note that you need to run Sharing Register Service as a separate process for it to work)***
+
+```bash
+./examples/example1/SharingServiceExample
 ```

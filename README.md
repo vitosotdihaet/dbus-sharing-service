@@ -65,9 +65,14 @@ For working with files in a working directory, instead of writing the whole abso
 # Sharing Service
 Sharing Service is a dynamic C++ library that can be used for an easy development of services
 
-Class `SharingService` is the only thing added with this library. On construction, a new DBus object is created with a single method - `OpenFile`
+Class `SharingService` is the only thing added with this library.
 
-The constructor of the `SharingService` accepts three arguments: a DBus object path, the supported formats of the service and a function, accepting `QString` and returning `void` to be run when method `OpenFile` is invoked
+The constructor of the `SharingService` accepts three arguments:
+- `QString serviceName` - a DBus object path
+- `QStringList supportedFormats` - the supported formats of the service
+- `void onOpenFile(QString)` - a function to be run when method `OpenFile` is invoked
+
+On construction, a new DBus object is created with a single method - `OpenFile` and it calls a method `comcom.system.sharing.RegisterService` of `com.system.sharing` with `serviceName` as the first argument and `supportedFormats` as the second one 
 
 ## How to use as a library
 After building with `BUILD_LIBSS=ON`, you need to link the library and include the header file to your target program

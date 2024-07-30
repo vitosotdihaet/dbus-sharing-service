@@ -35,7 +35,7 @@ Sharing Register Service has three methods:
 
 To exit, simply press `Ctrl+C`
 
-## How to use
+## How to use while running
 Registering a service:
 ```bash
 gdbus call -e -d com.system.sharing -o / -m com.system.sharing.RegisterService "your.dbus.service" "[\"supported\", \"extensions\"]"
@@ -69,7 +69,7 @@ Class `SharingService` is the only thing added with this library. On constructio
 
 The constructor of the `SharingService` accepts three arguments: a DBus object path, the supported formats of the service and a function, accepting `QString` and returning `void` to be run when method `OpenFile` is invoked
 
-## How to use
+## How to use as a library
 After building with `BUILD_LIBSS=ON`, you need to link the library and include the header file to your target program
 
 Set up your `main.cpp`:
@@ -116,7 +116,7 @@ target_link_libraries(main PRIVATE Qt6::Core Qt6::DBus ss)
 
 To exit, press `Ctrl+C`
 
-## Accessing the service directly
+## Accessing the service while running
 ```bash
 gdbus call -e -d my.audio.service -o / -m my.audio.service.OpenFile "`pwd`/Documents/sound.mp3"
 ```

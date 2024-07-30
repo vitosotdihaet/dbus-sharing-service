@@ -1,16 +1,10 @@
-cmake_minimum_required(VERSION 3.14)
 project(SharingServiceExample)
-
-set(CMAKE_CXX_STANDARD 17)
-
-find_package(Qt6 REQUIRED COMPONENTS DBus)
 
 add_custom_target(
     COMMAND configure_file(${CMAKE_SOURCE_DIR}/build/libss.so lib/libss.so COPYONLY)
     MAIN_DEPENDENCY ss
     DEPENDS ${CMAKE_SOURCE_DIR}/build/libss.so
 )
-
 
 configure_file(${CMAKE_SOURCE_DIR}/sharingService/include/sharingService.hpp include/sharingService.hpp COPYONLY)
 

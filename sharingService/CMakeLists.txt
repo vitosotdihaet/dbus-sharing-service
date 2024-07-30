@@ -1,0 +1,21 @@
+set(SHARING_SERVICE ${CMAKE_SOURCE_DIR}/sharingService)
+
+set(SHARING_SERVICE_INCLUDE ${SHARING_SERVICE}/include)
+set(SHARING_SERVICE_SOURCES ${SHARING_SERVICE}/src)
+
+set(SHARING_SERVICE_HEADERS
+    ${SHARING_SERVICE_INCLUDE}/sharingService.hpp
+)
+
+set(SHARING_SERVICE_SOURCES
+    ${SHARING_SERVICE_SOURCES}/sharingService.cpp
+)
+
+add_library(ss SHARED
+    ${SHARING_SERVICE_HEADERS}
+    ${SHARING_SERVICE_SOURCES}
+)
+
+target_include_directories(ss PRIVATE ${SHARING_SERVICE_INCLUDE})
+
+target_link_libraries(ss PRIVATE Qt6::DBus)

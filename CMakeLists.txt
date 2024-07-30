@@ -15,58 +15,15 @@ option(BUILD_EXAMPLES "Build the example" OFF)
 
 # Sharing Register Service
 if (BUILD_SRS)
-    set(SHARING_REGISTER_SERVICE ${CMAKE_SOURCE_DIR}/sharingRegisterService)
-
-    set(SHARING_REGISTER_SERVICE_INCLUDE ${SHARING_REGISTER_SERVICE}/include)
-    set(SHARING_REGISTER_SERVICE_SOURCES ${SHARING_REGISTER_SERVICE}/src)
-
-    set(SHARING_REGISTER_SERVICE_HEADERS
-        ${SHARING_REGISTER_SERVICE_INCLUDE}/sharingRegisterService.hpp
-    )
-
-    set(SHARING_REGISTER_SERVICE_SOURCES
-        ${SHARING_REGISTER_SERVICE_SOURCES}/main.cpp
-        ${SHARING_REGISTER_SERVICE_SOURCES}/sharingRegisterService.cpp
-    )
-
-    qt6_wrap_cpp(SHARING_REGISTER_SERVICE_MOC_SOURCES ${SHARING_REGISTER_SERVICE_HEADERS})
-
-    add_executable(srs
-        ${SHARING_REGISTER_SERVICE_SOURCES}
-        ${SHARING_REGISTER_SERVICE_MOC_SOURCES}
-    )
-
-    target_include_directories(srs PRIVATE ${SHARING_REGISTER_SERVICE_INCLUDE})
-    target_link_libraries(srs PRIVATE Qt6::DBus)
+    add_subdirectory(sharingRegisterService)
 endif (BUILD_SRS)
-
 
 # Sharing Service dynamic library
 if (BUILD_LIBSS)
-    set(SHARING_SERVICE ${CMAKE_SOURCE_DIR}/sharingService)
-
-    set(SHARING_SERVICE_INCLUDE ${SHARING_SERVICE}/include)
-    set(SHARING_SERVICE_SOURCES ${SHARING_SERVICE}/src)
-
-    set(SHARING_SERVICE_HEADERS
-        ${SHARING_SERVICE_INCLUDE}/sharingService.hpp
-    )
-
-    set(SHARING_SERVICE_SOURCES
-        ${SHARING_SERVICE_SOURCES}/sharingService.cpp
-    )
-
-    add_library(ss SHARED
-        ${SHARING_SERVICE_HEADERS}
-        ${SHARING_SERVICE_SOURCES}
-    )
-
-    target_include_directories(ss PRIVATE ${SHARING_SERVICE_INCLUDE})
-
-    target_link_libraries(ss PRIVATE Qt6::DBus)
-    # Examples
-    if (BUILD_EXAMPLES)
-        add_subdirectory(${CMAKE_SOURCE_DIR}/examples)
-    endif (BUILD_EXAMPLES)
+    add_subdirectory(sharingService)
 endif (BUILD_LIBSS)
 
+# Examples
+if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif (BUILD_EXAMPLES)

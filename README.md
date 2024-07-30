@@ -73,7 +73,7 @@ The constructor of the `SharingService` accepts three arguments: a DBus object p
 After building, you need to link the library and include the header file to your target program
 
 Set up your `main.cpp`:
-```
+```cpp
 #include "sharingService.hpp"
 
 #include <QtGlobal>

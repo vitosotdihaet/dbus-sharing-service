@@ -70,7 +70,7 @@ Class `SharingService` is the only thing added with this library. On constructio
 The constructor of the `SharingService` accepts three arguments: a DBus object path, the supported formats of the service and a function, accepting `QString` and returning `void` to be run when method `OpenFile` is invoked
 
 ## How to use (`cmake`)
-After building, you need to link the library and include the header file to your target program
+After building with `BUILD_LIBSS`, you need to link the library and include the header file to your target program
 
 Set up your `main.cpp`:
 ```cpp
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 The `onOpenFile` function, that is passed to the constructor must be of type `void` and accept a single parameter `const QString &`
 
 Next, update your cmake building script - add linking to `libss.so` and include the header:
-- Copy the shared library `libss.so` and put it into your `lib` folder
+- Copy the shared library `build/sharingService/libss.so` and put it into your `lib` folder
 - Copy the header `sharingService/include/sharingService.hpp` to your `include` folder
 ```cmake
 find_package(Qt6 REQUIRED COMPONENTS Core DBus)

@@ -18,4 +18,4 @@ add_library(ss SHARED
 
 target_include_directories(ss PRIVATE ${SHARING_SERVICE_INCLUDE})
 
-target_link_libraries(ss PRIVATE Qt6::DBus)
+target_link_libraries(ss PRIVATE Qt6::Core Qt6::DBus)

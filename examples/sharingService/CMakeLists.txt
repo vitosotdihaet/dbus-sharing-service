@@ -16,4 +16,4 @@ link_directories(lib)
 
 add_executable(SharingServiceExample src/main.cpp ${MOC_SOURCES})
 
-target_link_libraries(SharingServiceExample PRIVATE Qt6::DBus ss)
+target_link_libraries(SharingServiceExample PRIVATE Qt6::Core Qt6::DBus ss)

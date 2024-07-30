@@ -4,7 +4,7 @@ project(SharingService)
 
 set(CMAKE_CXX_STANDARD 11)
 
-find_package(Qt6 REQUIRED COMPONENTS DBus)
+find_package(Qt6 REQUIRED COMPONENTS Core DBus)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 

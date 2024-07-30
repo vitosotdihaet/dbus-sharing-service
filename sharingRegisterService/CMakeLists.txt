@@ -20,4 +20,4 @@ add_executable(srs
 )
 
 target_include_directories(srs PRIVATE ${SHARING_REGISTER_SERVICE_INCLUDE})
-target_link_libraries(srs PRIVATE Qt6::DBus)
+target_link_libraries(srs PRIVATE Qt6::Core Qt6::DBus)

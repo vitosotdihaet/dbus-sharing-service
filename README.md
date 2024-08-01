@@ -6,7 +6,7 @@ Make sure Qt6 is installed on your machine, if not, please follow [this tutorial
 git clone https://github.com/vitosotdihaet/dbus-sharing-service.git
 cd dbus-sharing-service
 mkdir build && cd build
-cmake ..
+cmake -DBUILD_EXAMPLES=ON ..
 make
 ```
 
@@ -138,5 +138,5 @@ make
 Shows a basic setup for using the Sharing Service ***(note that you need to run Sharing Register Service as a separate process for it to work)***
 
 ```bash
-./examples/example1/SharingServiceExample
+./examples/sharingService/SharingServiceExample
 ```

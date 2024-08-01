@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDBusConnection>
 #include <QDBusContext>
 #include <QMap>
 #include <QObject>
@@ -25,6 +26,7 @@ public slots:
 private:
   QMap<QString, QStringList> services;
   QString configFilePath = "services.ini";
+  QDBusConnection dbusConnection = QDBusConnection::sessionBus();
 
   bool openFileUsingService(const QString &path, const QString &service);
   void loadServices();

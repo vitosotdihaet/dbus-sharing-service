@@ -1,6 +1,5 @@
 #include "sharingService.hpp"
 
-#include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusMessage>
@@ -22,8 +21,7 @@ bool SharingService::start() {
 }
 
 bool SharingService::registerService() {
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-  if (!dbus.registerService(serviceName)) {
+  if (!dbusConnection.registerService(serviceName)) {
     qInfo("Can't register D-Bus service.");
     return false;
   }
@@ -32,8 +30,7 @@ bool SharingService::registerService() {
 }
 
 bool SharingService::registerObject() {
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-  if (!dbus.registerVirtualObject("/", this)) {
+  if (!dbusConnection.registerVirtualObject("/", this)) {
     qInfo("Can't register D-Bus object.");
     return false;
   }
@@ -42,14 +39,13 @@ bool SharingService::registerObject() {
 }
 
 bool SharingService::addToSharingRegisterService() {
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-  if (!dbus.isConnected()) {
+  if (!dbusConnection.isConnected()) {
     qInfo("Can't connect to the D-Bus session bus.");
     return false;
   }
 
   QDBusInterface interface("com.system.sharing", "/", "com.system.sharing",
-                           dbus); // autoexec if not running
+                           dbusConnection); // autoexec if not running
   if (!interface.isValid()) {
     qInfo("The sharing system is not running.");
     return false;
@@ -102,7 +98,7 @@ bool SharingService::handleMessage(const QDBusMessage &message,
 QString SharingService::introspect(const QString &path) const {
   return QString("<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object "
                  "Introspection 1.0//EN\" "
-                 "\"http://www.freedesktop.org/standards/dbus/1.0/"
+                 "\"http://www.freedesktop.org/standards/dbusConnection/1.0/"
                  "introspect.dtd\">\n"
                  "<node>\n"
                  "  <interface name=\"%1\">\n"

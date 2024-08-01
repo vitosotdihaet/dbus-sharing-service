@@ -1,7 +1,6 @@
 #include "sharingRegisterService.hpp"
 
 #include <QCoreApplication>
-#include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusMessage>
@@ -14,24 +13,24 @@
 
 SharingRegisterService::SharingRegisterService(QObject *parent)
     : QObject(parent) {
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-
-  if (!dbus.isConnected()) {
+  if (!dbusConnection.isConnected()) {
     qFatal("Can't connect to the D-Bus session bus.");
     return;
   }
 
-  if (dbus.interface()->isServiceRegistered(QString(DBUS_SERVICE_NAME))) {
+  if (dbusConnection.interface()->isServiceRegistered(
+          QString(DBUS_SERVICE_NAME))) {
     qFatal("Service is already registered.");
     return;
   }
 
-  if (!dbus.registerService(QString(DBUS_SERVICE_NAME))) {
+  if (!dbusConnection.registerService(QString(DBUS_SERVICE_NAME))) {
     qFatal("Can't register D-Bus service.");
     return;
   }
 
-  if (!dbus.registerObject("/", this, QDBusConnection::ExportAllSlots)) {
+  if (!dbusConnection.registerObject("/", this,
+                                     QDBusConnection::ExportAllSlots)) {
     qFatal("Can't register D-Bus object.");
     return;
   }
@@ -96,13 +95,12 @@ bool SharingRegisterService::openFileUsingService(const QString &path,
     return false;
   }
 
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-  if (!dbus.isConnected()) {
+  if (!dbusConnection.isConnected()) {
     qFatal("Cannot connect to the D-Bus session bus.");
     return false;
   }
 
-  QDBusInterface interface(service, "/", service, dbus);
+  QDBusInterface interface(service, "/", service, dbusConnection);
   if (!interface.isValid()) {
     qFatal("D-Bus interface is not valid.");
     return false;
@@ -140,8 +138,7 @@ void SharingRegisterService::saveServices() {
 }
 
 bool SharingRegisterService::isServiceRunning(const QString &service) {
-  QDBusConnection dbus = QDBusConnection::sessionBus();
-  if (dbus.interface()->isServiceRegistered(service)) {
+  if (dbusConnection.interface()->isServiceRegistered(service)) {
     return true;
   }
   return false;

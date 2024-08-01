@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDBusConnection>
 #include <QDBusVirtualObject>
 #include <QObject>
 #include <QString>
@@ -26,6 +27,8 @@ public slots:
 private:
   QString serviceName;
   QStringList supportedFormats;
+  QDBusConnection dbusConnection = QDBusConnection::sessionBus();
+
   std::function<void(const QString &)> onOpenFile;
   bool registerService();
   bool registerObject();

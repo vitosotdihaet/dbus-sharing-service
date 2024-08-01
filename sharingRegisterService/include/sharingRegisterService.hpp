@@ -1,11 +1,10 @@
 #pragma once
 
+#include <QDBusContext>
 #include <QMap>
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QDBusContext> 
-
 
 #define DBUS_SERVICE_NAME "com.system.sharing"
 

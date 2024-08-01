@@ -63,7 +63,7 @@ void SharingRegisterService::OpenFile(const QString &path) {
   if (availableServices.isEmpty()) {
     QDBusMessage error;
     sendErrorReply(QDBusError::InvalidArgs,
-                            "No available services to open " + path);
+                   "No available services to open " + path);
     return;
   }
 
@@ -80,7 +80,8 @@ void SharingRegisterService::OpenFileUsingService(const QString &path,
                                                   const QString &service) {
   if (!openFileUsingService(path, service)) {
     QDBusMessage error;
-    sendErrorReply(QDBusError::InvalidArgs, "Could not send " + path + " to " + service);
+    sendErrorReply(QDBusError::InvalidArgs,
+                   "Could not send " + path + " to " + service);
     return;
   }
 }

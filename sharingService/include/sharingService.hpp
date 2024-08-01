@@ -21,7 +21,7 @@ public:
   QString introspect(const QString &path) const override;
 
 public slots:
-  void OpenFile(const QString &path);
+  bool OpenFile(const QString &path);
 
 private:
   QString serviceName;

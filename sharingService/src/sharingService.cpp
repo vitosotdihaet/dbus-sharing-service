@@ -42,14 +42,14 @@ bool SharingService::registerObject() {
 }
 
 bool SharingService::addToSharingRegisterService() {
-  QDBusConnection connection = QDBusConnection::sessionBus();
-  if (!connection.isConnected()) {
+  QDBusConnection dbus = QDBusConnection::sessionBus();
+  if (!dbus.isConnected()) {
     qInfo("Can't connect to the D-Bus session bus.");
     return false;
   }
 
   QDBusInterface interface("com.system.sharing", "/", "com.system.sharing",
-                           connection); // autoexec if not running
+                           dbus); // autoexec if not running
   if (!interface.isValid()) {
     qInfo("The sharing system is not running.");
     return false;
@@ -65,31 +65,34 @@ bool SharingService::addToSharingRegisterService() {
   return true;
 }
 
-void SharingService::OpenFile(const QString &path) {
+bool SharingService::OpenFile(const QString &path) {
   QFile file(path);
   if (!file.exists()) {
     qInfo() << "File" << path << "doesn't exist";
-    QDBusMessage error = QDBusMessage::createError(
-        QDBusError::InvalidArgs, "File" + path.toLatin1() + "doesn't exist");
-    QDBusConnection::sessionBus().send(error);
-    return;
+    return false;
   }
   onOpenFile(path);
+  return true;
 }
 
 bool SharingService::handleMessage(const QDBusMessage &message,
-                                   const QDBusConnection &connection) {
+                                   const QDBusConnection &dbus) {
   if (message.interface() == serviceName && message.member() == "OpenFile") {
     if (message.arguments().size() != 1) {
       QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs,
                                                      "Invalid arguments");
-      connection.send(error);
+      dbus.send(error);
       return true;
     }
     QString path = message.arguments().at(0).toString();
-    OpenFile(path);
-    QDBusMessage reply = message.createReply();
-    connection.send(reply);
+    
+    QDBusMessage reply;
+    if (OpenFile(path)) {
+      reply = message.createReply();
+    } else {
+      reply = message.createErrorReply(QDBusError::BadAddress, "File" + path + "doesn't exist");
+    }
+    dbus.send(reply);
     return true;
   }
   return false;

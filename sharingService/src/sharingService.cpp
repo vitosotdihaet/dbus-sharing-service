@@ -85,12 +85,13 @@ bool SharingService::handleMessage(const QDBusMessage &message,
       return true;
     }
     QString path = message.arguments().at(0).toString();
-    
+
     QDBusMessage reply;
     if (OpenFile(path)) {
       reply = message.createReply();
     } else {
-      reply = message.createErrorReply(QDBusError::InvalidArgs, "File" + path + "doesn't exist");
+      reply = message.createErrorReply(QDBusError::InvalidArgs,
+                                       "File" + path + "doesn't exist");
     }
     dbus.send(reply);
     return true;

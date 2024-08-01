@@ -87,7 +87,7 @@ bool SharingService::handleMessage(const QDBusMessage &message,
       reply = message.createReply();
     } else {
       reply = message.createErrorReply(QDBusError::InvalidArgs,
-                                       "File" + path + "doesn't exist");
+                                       "File " + path + " doesn't exist");
     }
     dbus.send(reply);
     return true;

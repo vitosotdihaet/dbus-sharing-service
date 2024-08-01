@@ -1,7 +1,5 @@
 project(SharingServiceExample)
 
-
-
 include_directories(include)
 
 qt6_wrap_cpp(MOC_SOURCES include/sharingService.hpp)

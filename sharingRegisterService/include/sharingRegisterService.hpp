@@ -4,10 +4,12 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QDBusContext> 
+
 
 #define DBUS_SERVICE_NAME "com.system.sharing"
 
-class SharingRegisterService : public QObject {
+class SharingRegisterService : public QObject, protected QDBusContext {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
 
@@ -25,6 +27,7 @@ private:
   QMap<QString, QStringList> services;
   QString configFilePath = "services.ini";
 
+  bool openFileUsingService(const QString &path, const QString &service);
   void loadServices();
   void saveServices();
   bool isServiceRunning(const QString &service);

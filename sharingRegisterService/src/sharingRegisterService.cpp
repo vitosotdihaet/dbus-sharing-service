@@ -14,26 +14,24 @@
 
 SharingRegisterService::SharingRegisterService(QObject *parent)
     : QObject(parent) {
-  QDBusConnection dbusConnection = QDBusConnection::sessionBus();
+  QDBusConnection dbus = QDBusConnection::sessionBus();
 
-  if (!dbusConnection.isConnected()) {
+  if (!dbus.isConnected()) {
     qFatal("Can't connect to the D-Bus session bus.");
     return;
   }
 
-  if (dbusConnection.interface()->isServiceRegistered(
-          QString(DBUS_SERVICE_NAME))) {
+  if (dbus.interface()->isServiceRegistered(QString(DBUS_SERVICE_NAME))) {
     qFatal("Service is already registered.");
     return;
   }
 
-  if (!dbusConnection.registerService(QString(DBUS_SERVICE_NAME))) {
+  if (!dbus.registerService(QString(DBUS_SERVICE_NAME))) {
     qFatal("Can't register D-Bus service.");
     return;
   }
 
-  if (!dbusConnection.registerObject("/", this,
-                                     QDBusConnection::ExportAllSlots)) {
+  if (!dbus.registerObject("/", this, QDBusConnection::ExportAllSlots)) {
     qFatal("Can't register D-Bus object.");
     return;
   }
@@ -53,15 +51,7 @@ void SharingRegisterService::RegisterService(
 }
 
 void SharingRegisterService::OpenFile(const QString &path) {
-  QFile file(path);
-  if (!file.exists()) {
-    QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs,
-                                                   "File does not exist");
-    QDBusConnection::sessionBus().send(error);
-    return;
-  }
-
-  QString fileExtension = QFileInfo(file).suffix().toLower();
+  QString fileExtension = QFileInfo(path).suffix().toLower();
 
   QStringList availableServices;
   for (auto it = services.cbegin(); it != services.cend(); ++it) {
@@ -71,44 +61,60 @@ void SharingRegisterService::OpenFile(const QString &path) {
   }
 
   if (availableServices.isEmpty()) {
-    QDBusMessage error = QDBusMessage::createError(
-        QDBusError::InvalidArgs, "No available services to open the file");
-    QDBusConnection::sessionBus().send(error);
+    QDBusMessage error;
+    sendErrorReply(QDBusError::InvalidArgs,
+                            "No available services to open " + path);
     return;
   }
 
   QString selectedService =
       availableServices.at(std::rand() % availableServices.size());
-  OpenFileUsingService(path, selectedService);
+  if (!openFileUsingService(path, selectedService)) {
+    QDBusMessage error;
+    sendErrorReply(QDBusError::InvalidArgs, "Could not open " + path);
+    return;
+  }
 }
 
 void SharingRegisterService::OpenFileUsingService(const QString &path,
                                                   const QString &service) {
+  if (!openFileUsingService(path, service)) {
+    QDBusMessage error;
+    sendErrorReply(QDBusError::InvalidArgs, "Could not send " + path + " to " + service);
+    return;
+  }
+}
+
+bool SharingRegisterService::openFileUsingService(const QString &path,
+                                                  const QString &service) {
+  QFile file(path);
+  if (!file.exists()) {
+    return false;
+  }
   if (!services.contains(service) || !isServiceRunning(service)) {
-    QDBusMessage error = QDBusMessage::createError(QDBusError::InvalidArgs,
-                                                   "Service is not registered");
-    QDBusConnection::sessionBus().send(error);
-    return;
+    return false;
   }
 
-  QDBusConnection connection = QDBusConnection::sessionBus();
-  if (!connection.isConnected()) {
+  QDBusConnection dbus = QDBusConnection::sessionBus();
+  if (!dbus.isConnected()) {
     qFatal("Cannot connect to the D-Bus session bus.");
-    return;
+    return false;
   }
 
-  QDBusInterface interface(service, "/", service, connection);
+  QDBusInterface interface(service, "/", service, dbus);
   if (!interface.isValid()) {
     qFatal("D-Bus interface is not valid.");
-    return;
+    return false;
   }
 
   QDBusMessage reply = interface.call("OpenFile", path);
   if (reply.type() == QDBusMessage::ErrorMessage) {
     qDebug() << "Failed to open the file:" << path << "with service:" << service
              << "--" << reply.errorMessage();
-    return;
+    return false;
   }
+
+  return true;
 }
 
 void SharingRegisterService::loadServices() {
@@ -133,8 +139,8 @@ void SharingRegisterService::saveServices() {
 }
 
 bool SharingRegisterService::isServiceRunning(const QString &service) {
-  QDBusConnection dbusConnection = QDBusConnection::sessionBus();
-  if (dbusConnection.interface()->isServiceRegistered(service)) {
+  QDBusConnection dbus = QDBusConnection::sessionBus();
+  if (dbus.interface()->isServiceRegistered(service)) {
     return true;
   }
   return false;
